@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rung Chuông Vàng</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #F5D98B; --sand-dark: #E8C56A;
+    --ocean: #5BB8D4; --ocean-dark: #3A9AB8;
+    --coral: #E8604C; --green: #5CB85C; --green-dark: #4A9E4A;
+    --text-dark: #5D3A1A; --text-mid: #7A4F2B;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Baloo 2', cursive;
+    background: linear-gradient(180deg, #87CEEB 0%, #B8E4F7 40%, #F5D98B 70%, #E8C56A 100%);
+    min-height: 100vh; overflow: hidden;
+  }
+
+  /* BG DECOR */
+  .bg-decor { position:fixed; pointer-events:none; z-index:0; width:100%; height:100%; top:0; left:0; overflow:hidden; }
+  .wave { position:absolute; bottom:0; left:0; width:100%; }
+  .cloud { position:absolute; background:white; border-radius:50px; opacity:0.8; animation:float 6s ease-in-out infinite; }
+  .cloud::before,.cloud::after { content:''; position:absolute; background:white; border-radius:50%; }
+  .cloud-1{width:80px;height:30px;top:8%;left:5%}
+  .cloud-1::before{width:40px;height:40px;top:-20px;left:10px}
+  .cloud-1::after{width:30px;height:30px;top:-15px;left:35px}
+  .cloud-2{width:100px;height:35px;top:12%;right:8%;animation-delay:2s}
+  .cloud-2::before{width:50px;height:50px;top:-25px;left:15px}
+  .cloud-2::after{width:35px;height:35px;top:-18px;left:55px}
+  .cloud-3{width:70px;height:28px;top:5%;left:40%;animation-delay:4s}
+  .cloud-3::before{width:35px;height:35px;top:-18px;left:10px}
+  .cloud-3::after{width:28px;height:28px;top:-14px;left:35px}
+  .starr{position:absolute;font-size:1.5rem;animation:spin 8s linear infinite}
+  .starr.s1{top:20%;left:3%}
+  .starr.s2{top:30%;right:4%;animation-delay:3s;font-size:2rem}
+  .fish{position:absolute;font-size:1.8rem;animation:swim 10s linear infinite}
+  .fish.f1{bottom:15%;left:-50px}
+  .fish.f2{bottom:20%;left:-50px;animation-delay:5s;font-size:1.4rem}
+
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @keyframes swim{from{left:-80px}to{left:110%}}
+  @keyframes bounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.05)}}
+  @keyframes pop{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+  @keyframes confetti-fall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+  @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4)}50%{box-shadow:0 0 0 20px rgba(255,215,0,0)}}
+  @keyframes timer-tick{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  @keyframes bell-ring{0%,100%{transform:rotate(0)}15%{transform:rotate(15deg)}30%{transform:rotate(-15deg)}45%{transform:rotate(10deg)}60%{transform:rotate(-10deg)}75%{transform:rotate(5deg)}}
+  @keyframes slide-up{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes reveal-pop{0%{transform:scale(0) rotate(-8deg);opacity:0}55%{transform:scale(1.18) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+  @keyframes glow-answer{0%,100%{box-shadow:0 6px 0 var(--green-dark),0 0 0 0 rgba(92,184,92,0.4)}50%{box-shadow:0 6px 0 var(--green-dark),0 0 22px 6px rgba(92,184,92,0.35)}}
+
+  /* SCREENS */
+  .screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;align-items:center;justify-content:center;flex-direction:column}
+  .screen.active{display:flex}
+  #video-screen{background:#000;z-index:30;}
+  #video-screen iframe{width:100%;height:100%;border:none;}
+  .video-close{position:absolute;top:18px;right:18px;z-index:31;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:42px;height:42px;font-size:1.25rem;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.25);}
+
+  /* ===== INTRO ===== */
+  .intro-card {
+    background: linear-gradient(145deg,#FFF9E6,#FFF3C4);
+    border: 4px solid var(--sand-dark); border-radius:30px;
+    padding: 36px 48px; text-align:center; max-width:500px; width:90%;
+    box-shadow:0 15px 50px rgba(93,58,26,0.2);
+    position:relative; animation:slide-up 0.6s ease;
+    clip-path:polygon(0 2%,3% 0,6% 2%,9% 0,12% 2%,15% 0,18% 2%,21% 0,24% 2%,27% 0,100% 0,100% 98%,97% 100%,94% 98%,91% 100%,88% 98%,85% 100%,82% 98%,79% 100%,76% 98%,73% 100%,0 100%);
+  }
+  .intro-emoji{font-size:3.8rem;margin-bottom:8px;animation:bounce 2s ease-in-out infinite;display:block}
+  .intro-title{font-size:30px;font-weight:800;color:var(--coral);line-height:1.1;text-shadow:3px 3px 0 var(--sand-dark);margin-bottom:8px}
+  .intro-subtitle{font-size:1.05rem;color:var(--text-mid);margin-bottom:8px;font-weight:600}
+  .intro-desc{font-size:0.93rem;color:var(--text-mid);margin-bottom:22px;line-height:1.65;background:rgba(255,200,50,0.2);border-radius:15px;padding:12px 18px}
+  .intro-desc span{font-weight:700;color:var(--coral)}
+  .btn-start{background:linear-gradient(145deg,#E84040,#C0392B);color:white;border:none;border-radius:50px;padding:15px 48px;font-size:1.25rem;font-weight:800;font-family:'Baloo 2',cursive;cursor:pointer;letter-spacing:2px;box-shadow:0 6px 0 #922B21,0 8px 20px rgba(0,0,0,0.2);transition:all 0.15s;animation:pulse-glow 2s ease-in-out infinite}
+  .btn-start:hover{transform:translateY(-3px);box-shadow:0 9px 0 #922B21}
+  .btn-start:active{transform:translateY(3px);box-shadow:0 3px 0 #922B21}
+  .btn-award{background:linear-gradient(145deg,#FFD700,#FFC200);color:#5D3A1A;border:none;border-radius:50px;padding:12px 32px;font-size:1rem;font-weight:800;font-family:'Baloo 2',cursive;cursor:pointer;letter-spacing:1px;box-shadow:0 5px 0 #E6A800;transition:all 0.15s;margin-top:12px}
+  .btn-award:hover{transform:translateY(-2px);box-shadow:0 7px 0 #E6A800}
+  .btn-award:active{transform:translateY(2px);box-shadow:0 3px 0 #E6A800}
+  .intro-deco{position:absolute;font-size:2rem}
+  .id1{top:-20px;left:20px;transform:rotate(-20deg)}
+  .id2{top:-15px;right:25px;transform:rotate(15deg)}
+  .id3{bottom:-15px;left:30px;transform:rotate(10deg)}
+  .id4{bottom:-20px;right:20px;transform:rotate(-15deg)}
+  .bell-top{font-size:3rem;animation:bell-ring 2s ease-in-out infinite;display:inline-block;transform-origin:top center}
+
+  /* ===== QUIZ SCREEN ===== */
+  #quiz-screen{padding:16px 20px 10px;justify-content:flex-start;overflow-y:auto}
+
+  .progress-wrap{width:100%;max-width:900px;background:rgba(255,255,255,0.5);border-radius:20px;height:12px;margin-bottom:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.8)}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--ocean),var(--coral));border-radius:20px;transition:width 0.5s ease}
+
+  .quiz-header{width:100%;max-width:900px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .q-counter{background:linear-gradient(145deg,#FFF3C4,#FFE88A);border:3px solid var(--sand-dark);border-radius:20px;padding:8px 20px;font-size:0.95rem;font-weight:700;color:var(--text-dark);box-shadow:0 4px 0 var(--sand-dark)}
+
+  /* Timer */
+  .timer-wrap{display:flex;flex-direction:column;align-items:center}
+  .timer-circle{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,#fff,#f8f8f8);border:4px solid var(--ocean);display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:800;color:var(--ocean-dark);box-shadow:0 4px 0 var(--ocean-dark);position:relative;transition:all 0.3s}
+  .timer-circle.urgent{border-color:var(--coral);color:var(--coral);box-shadow:0 4px 0 #C0392B;animation:timer-tick 0.5s ease-in-out infinite}
+  .timer-circle.done{border-color:#bbb;color:#bbb;box-shadow:0 4px 0 #aaa;animation:none}
+  .timer-label{font-size:0.65rem;font-weight:700;color:var(--text-mid);margin-top:3px;letter-spacing:1px}
+  .timer-actions{margin-top:8px;display:flex;justify-content:center}
+  .btn-timer{background:linear-gradient(145deg,#FFB74D,#FF8A00);color:white;border:none;border-radius:999px;padding:10px 18px;font-size:0.95rem;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #D07000;transition:transform 0.15s,opacity 0.15s;}
+  .btn-timer:hover{transform:translateY(-2px)}
+  .btn-timer:active{transform:translateY(2px)}
+  .btn-timer:disabled{opacity:0.55;cursor:not-allowed;box-shadow:0 3px 0 #D07000;}
+  .timer-svg{position:absolute;top:-4px;left:-4px;width:76px;height:76px;transform:rotate(-90deg)}
+  .timer-ring{fill:none;stroke:var(--ocean);stroke-width:4;stroke-dasharray:216;stroke-dashoffset:0;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke 0.3s}
+  .timer-ring.urgent{stroke:var(--coral)}
+  .timer-ring.done{stroke:#bbb;transition:none}
+
+  .q-info{background:linear-gradient(145deg,#FFD700,#FFC200);border:3px solid #E6A800;border-radius:20px;padding:8px 18px;font-size:0.95rem;font-weight:800;color:var(--text-dark);box-shadow:0 4px 0 #E6A800;text-align:center;min-width:110px}
+
+  /* Question card */
+  .q-card{background:linear-gradient(145deg,#FFF9E6,#FFF3C4);border:4px solid var(--sand-dark);border-radius:25px;padding:18px 28px;width:100%;max-width:900px;text-align:center;box-shadow:0 8px 0 var(--sand-dark),0 12px 30px rgba(0,0,0,0.08);margin-bottom:14px;position:relative;clip-path:polygon(0 3%,2% 0,4% 3%,6% 0,8% 3%,10% 0,12% 3%,100% 0,100% 97%,98% 100%,96% 97%,94% 100%,92% 97%,0 100%)}
+  .q-number{font-size:0.8rem;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .q-emoji{font-size:2rem;margin-bottom:5px;display:block}
+  .q-text{font-size:1.5rem;font-weight:800;color:var(--text-dark);line-height:1.4}
+
+  /* Answers */
+  .answers-grid{display:grid;gap:11px;width:100%;max-width:900px}
+  .grid-3{grid-template-columns:1fr 1fr 1fr}
+  .grid-2{grid-template-columns:1fr 1fr}
+
+  .ans-btn{
+    background:white; border:4px solid var(--ocean); border-radius:18px;
+    padding:14px 18px; font-size:1.05rem; font-weight:700;
+    font-family:'Baloo 2',cursive; color:var(--text-dark);
+    display:flex; align-items:center; gap:11px;
+    box-shadow:0 5px 0 var(--ocean-dark); position:relative;
+    text-align:left; pointer-events:none; /* locked during timer */
+    opacity:0.72; transition:opacity 0.3s,background 0.3s,border-color 0.3s;
+    cursor:default;
+  }
+  .ans-btn.reveal-correct{
+    background:linear-gradient(145deg,#D4EDDA,#A8DDB5);
+    border-color:var(--green);
+    box-shadow:0 5px 0 var(--green-dark);
+    opacity:1;
+    animation:pop 0.45s ease, glow-answer 1.8s 0.45s ease-in-out infinite;
+  }
+  .ans-btn.reveal-correct .ans-label{background:var(--green);box-shadow:0 3px 0 var(--green-dark)}
+  .ans-label{width:32px;height:32px;border-radius:50%;background:var(--ocean);color:white;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:800;flex-shrink:0;box-shadow:0 3px 0 var(--ocean-dark)}
+
+  /* Correct tick badge */
+  .correct-tick{display:none;position:absolute;top:-12px;right:-8px;background:var(--green);color:white;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:1rem;font-weight:800;box-shadow:0 2px 0 var(--green-dark);animation:pop 0.4s ease}
+  .ans-btn.reveal-correct .correct-tick{display:flex}
+
+  /* Reveal / Next buttons */
+  .action-row{width:100%;max-width:900px;display:flex;justify-content:center;align-items:center;gap:14px;margin-top:8px;min-height:64px}
+  .btn-reveal{
+    display:none; background:linear-gradient(145deg,#5CB85C,#4A9E4A); color:white; border:none; border-radius:50px;
+    padding:15px 52px; font-size:1.25rem; font-weight:800; font-family:'Baloo 2',cursive; cursor:pointer;
+    box-shadow:0 7px 0 #3A7E3A,0 10px 25px rgba(0,0,0,0.18); letter-spacing:1px;
+    animation:reveal-pop 0.5s cubic-bezier(.36,1.8,.64,1) both;
+  }
+  .btn-reveal.show{display:block}
+  .btn-reveal:hover{transform:translateY(-3px);box-shadow:0 10px 0 #3A7E3A}
+  .btn-reveal:active{transform:translateY(4px);box-shadow:0 3px 0 #3A7E3A}
+
+  .btn-next{
+    display:none; background:linear-gradient(145deg,#5BB8D4,#3A9AB8); color:white; border:none; border-radius:50px;
+    padding:14px 44px; font-size:1.15rem; font-weight:800; font-family:'Baloo 2',cursive; cursor:pointer;
+    box-shadow:0 6px 0 #2B7A94; animation:pop 0.4s ease;
+  }
+  .btn-next.show{display:block}
+  .btn-next:hover{transform:translateY(-3px)}
+  .btn-next:active{transform:translateY(3px)}
+
+  /* RESULT */
+  #result-screen{background:linear-gradient(180deg,#87CEEB,#F5D98B)}
+  .result-card{background:linear-gradient(145deg,#FFF9E6,#FFF3C4);border:5px solid var(--sand-dark);border-radius:30px;padding:40px 50px;text-align:center;max-width:480px;width:90%;box-shadow:0 15px 0 var(--sand-dark);animation:pop 0.6s ease}
+  .r-emoji{font-size:5rem;margin-bottom:10px;animation:bounce 1.5s ease-in-out infinite;display:block}
+  .r-title{font-size:2.4rem;font-weight:800;color:var(--coral);margin-bottom:10px}
+  .r-score{font-size:3.8rem;font-weight:800;color:var(--text-dark);background:linear-gradient(145deg,#FFD700,#FFC200);border-radius:20px;padding:10px 28px;margin:14px auto;display:inline-block;box-shadow:0 6px 0 #E6A800}
+  .r-msg{font-size:1.1rem;color:var(--text-mid);margin-bottom:22px;font-weight:600;line-height:1.5}
+  .btn-restart{background:linear-gradient(145deg,#5CB85C,#4A9E4A);color:white;border:none;border-radius:50px;padding:15px 48px;font-size:1.1rem;font-weight:800;font-family:'Baloo 2',cursive;cursor:pointer;box-shadow:0 6px 0 #3A7E3A;transition:all 0.15s}
+  .btn-restart:hover{transform:translateY(-3px)}
+
+  /* Confetti */
+  .confetti-piece{position:fixed;border-radius:3px;pointer-events:none;z-index:999;animation:confetti-fall linear forwards}
+  .floating-reward{position:fixed;pointer-events:none;z-index:201;font-size:2rem;animation:confetti-fall 1.5s ease forwards}
+
+  @media(max-width:640px){
+    .intro-title{font-size:30px}
+    .q-text{font-size:1.18rem}
+    .grid-3,.grid-2{grid-template-columns:1fr}
+    .ans-btn{font-size:0.97rem;padding:12px 14px}
+    .q-card{padding:14px 16px}
+    .btn-reveal{font-size:1.1rem;padding:13px 38px}
+  }
+  .app-logo{
+    position:fixed;
+    top:16px;
+    right:16px;
+    width:100px;
+    height:100px;
+    z-index:25;
+    border-radius:50%;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+  }
+  .app-logo object,
+  .app-logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:0;
+  }
+</style>
+</head>
+<body>
+<div class="app-logo">
+  <object data="Logo.jpg" type="image/jpeg">Logo</object>
+</div>
+
+<div class="bg-decor">
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="starr s1">⭐</div>
+  <div class="starr s2">🌟</div>
+  <div class="fish f1">🐟</div>
+  <div class="fish f2">🐠</div>
+  <div class="wave">
+    <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,80 C240,120 480,40 720,80 C960,120 1200,40 1440,80 L1440,120 L0,120 Z" fill="rgba(91,184,212,0.3)"/>
+      <path d="M0,100 C360,60 720,120 1080,80 C1260,60 1380,100 1440,90 L1440,120 L0,120 Z" fill="rgba(91,184,212,0.5)"/>
+    </svg>
+  </div>
+</div>
+<audio id="bg-audio" src="bg-music.mp3" loop preload="metadata"></audio>
+<audio id="intro-audio" src="intro-music.mp3" loop preload="metadata"></audio>
+
+<!-- INTRO -->
+<div class="screen active" id="intro-screen">
+  <div style="text-align:center;margin-bottom:14px;position:relative;z-index:1">
+    <span class="bell-top">🔔</span>
+  </div>
+  <div class="intro-card" style="position:relative;z-index:1">
+    <span class="intro-deco id1">🌊</span>
+    <span class="intro-deco id2">⭐</span>
+    <span class="intro-deco id3">🐚</span>
+    <span class="intro-deco id4">🦀</span>
+    <span class="intro-emoji">🏆</span>
+    <h6 class="intro-title">Cuộc thi rung chuông vàng Trường mầm non Ngôi Nhà Xanh hệ thống Bsip Văn Quán Hà Đông năm học 2025- 2026.</h6>
+    <div class="intro-desc">
+      <span>30 câu hỏi</span> thú vị đang chờ các bé!<br>
+      Mỗi câu có <span>10 giây</span> để suy nghĩ 🤔<br>
+      Sau khi hết giờ nhấn <span>✅ Đáp án đúng</span> để xem kết quả!
+    </div>
+    <button class="btn-start" onclick="startQuiz()">LET'S START 🚀</button>
+    <!-- <button class="btn-award" onclick="showVideoScreen()">🎁 Trao giải</button> -->
+  </div>
+  <div style="margin-top:18px;display:flex;gap:14px;font-size:1.9rem;position:relative;z-index:1">
+    <span style="animation:float 2s ease-in-out infinite">🐠</span>
+    <span style="animation:float 2.5s ease-in-out infinite;animation-delay:0.5s">🌺</span>
+    <span style="animation:float 3s ease-in-out infinite;animation-delay:1s">🦀</span>
+    <span style="animation:float 2.2s ease-in-out infinite;animation-delay:1.5s">⚓</span>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="quiz-screen">
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <div class="quiz-header">
+    <div class="q-counter">❓ Câu <span id="q-num">1</span>/30</div>
+    <div class="timer-wrap">
+      <div class="timer-circle" id="timer-circle">
+        <svg class="timer-svg" viewBox="0 0 76 76">
+          <circle class="timer-ring" id="timer-ring" cx="38" cy="38" r="34"/>
+        </svg>
+        <span id="timer-display">10</span>
+      </div>
+      <div class="timer-label">GIÂY</div>
+      <div class="timer-actions">
+        <button class="btn-timer" id="btn-start-timer" onclick="activateTimer()">Bấm giờ</button>
+      </div>
+    </div>
+    <div class="q-info">🔔 Rung Chuông Vàng</div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-number" id="q-label">CÂU HỎI 1</div>
+    <span class="q-emoji" id="q-emoji">🤔</span>
+    <div class="q-text" id="q-text">Đang tải...</div>
+  </div>
+
+  <div class="answers-grid grid-3" id="answers-grid"></div>
+
+  <div class="action-row">
+    <button class="btn-reveal" id="btn-reveal" onclick="revealAnswer()">✅ Đáp án đúng</button>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">Câu tiếp ▶</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result-screen">
+  <div class="result-card">
+    <span class="r-emoji">🏆</span>
+    <div class="r-title">Hoàn thành!</div>
+    <div class="r-score">30/30</div>
+    <div class="r-msg">🎉 Chúc mừng các bạn đã hoàn thành<br><strong>Rung Chuông Vàng</strong>! 🌟<br>Các bạn thật xuất sắc! 🏅</div>
+    <button class="btn-restart" onclick="restartQuiz()">🔄 Chơi lại!</button>
+    <button class="btn-award" onclick="showVideoScreen()">🎁 Trao giải</button>
+  </div>
+</div>
+<div class="screen" id="video-screen">
+  <button class="video-close" onclick="closeVideo()">✕</button>
+  <iframe id="result-video" width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  <!-- <iframe id="result-video" width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
+</div>
+
+<script>
+// ===== AUDIO =====
+let audioCtx = null;
+let timeoutBuffer = null;
+let countdownSource = null;
+function getACtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function initAudioAssets(){
+  const ctx = getACtx();
+  fetch('timeout.mp3')
+    .then(res => res.arrayBuffer())
+    .then(data => ctx.decodeAudioData(data))
+    .then(buffer => { timeoutBuffer = buffer; })
+    .catch(() => { timeoutBuffer = null; });
+}
+initAudioAssets();
+playIntroMusic();
+function note(f,t,d,type='sine',vol=0.08){
+  try{
+    const c=getACtx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.04);g.gain.linearRampToValueAtTime(0,t+d-0.04);
+    o.start(t);o.stop(t+d);
+  }catch(e){}
+}
+function playIntroMusic(){
+  const audio = document.getElementById('intro-audio');
+  if(audio){
+    audio.volume = 0.35;
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+  }
+}
+function stopIntroMusic(){
+  const audio = document.getElementById('intro-audio');
+  if(audio){
+    audio.pause();
+    audio.currentTime = 0;
+  }
+}
+function playBgMusic(){
+  stopIntroMusic();
+  const audio = document.getElementById('bg-audio');
+  if(audio){
+    audio.volume = 0.35;
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+  }
+}
+function stopBg(){
+  const audio = document.getElementById('bg-audio');
+  if(audio){
+    audio.pause();
+    audio.currentTime = 0;
+  }
+}
+function playTick(u=false){
+  const c=getACtx();note(u?2000:980,c.currentTime,0.1,u?'sine':'triangle',u?0.16:0.14);
+}
+function startCountdownAudio(){
+  if(!timeoutBuffer) return;
+  stopCountdownAudio();
+  try{
+    const ctx = getACtx();
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    source.buffer = timeoutBuffer;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(1, ctx.currentTime);
+    source.start(ctx.currentTime);
+    source.stop(ctx.currentTime + timeLeft + 3);
+    countdownSource = source;
+  }catch(e){
+    countdownSource = null;
+  }
+}
+function stopCountdownAudio(){
+  if(countdownSource){
+    try{ countdownSource.stop(); }catch(e){}
+    countdownSource = null;
+  }
+}
+function playCorrect(){
+  const c=getACtx();
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>note(f,c.currentTime+i*0.12,0.28,'sine',0.14));
+}
+function playTimeout(){
+  try{
+    const c=getACtx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);o.type='triangle';
+    o.frequency.setValueAtTime(440,c.currentTime);
+    o.frequency.linearRampToValueAtTime(220,c.currentTime+0.5);
+    g.gain.setValueAtTime(0.1,c.currentTime);g.gain.linearRampToValueAtTime(0,c.currentTime+0.6);
+    o.start(c.currentTime);o.stop(c.currentTime+0.6);
+  }catch(e){}
+}
+function playBell(){
+  const c=getACtx();
+  [783.99,1046.5,1318.5,1568].forEach((f,i)=>{
+    try{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;
+      const t=c.currentTime+i*0.08;
+      g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+1.5);
+      o.start(t);o.stop(t+1.5);
+    }catch(e){}
+  });
+}
+
+// ===== QUESTIONS =====
+const questions = [
+  {q:"Một tuần lễ có bao nhiêu ngày?",emoji:"📅",ans:["6 ngày","7 ngày","5 ngày"],correct:1},
+  {q:"Hình gì có 3 cạnh?",emoji:"📐",ans:["Hình vuông","Hình tròn","Hình tam giác"],correct:2},
+  {q:"Có bao nhiêu giây trong 1 phút?",emoji:"⏱️",ans:["50 giây","70 giây","60 giây"],correct:2},
+  {q:"4 + 1 = ?",emoji:"🔢",ans:["6","5","7"],correct:1},
+  {q:'Bé hãy tìm từ trái nghĩa với từ "cao"?',emoji:"📏",ans:["Thấp","Dài","Ngắn"],correct:0},
+  {q:"Bạn Gấu có 10 bông hoa, Gấu tặng Voi 3 bông. Hỏi Gấu còn bao nhiêu bông?",emoji:"🌸",ans:["6 bông","5 bông","7 bông"],correct:2},
+  {q:'Chữ cái "o" có cấu tạo như thế nào?',emoji:"🔤",ans:["Nét cong tròn hở","Nét cong tròn","Nét cong tròn khép kín"],correct:2},
+  {q:"Hành tinh của chúng ta tên gì?",emoji:"🌍",ans:["Sao Thổ","Trái Đất","Hệ Mặt Trời"],correct:1},
+  {q:"Quả gì không dùng để ăn mà dùng để đá, để lăn, để chuyền?",emoji:"⚽",ans:["Quả bóng","Quả dưa hấu","Quả trứng"],correct:0},
+  {q:'Trong "Chùm nho", "Đu đủ", "Quả cam" — chữ "o" nằm ở từ nào?',emoji:"🍇",ans:["Chùm nho","Đu đủ","Quả cam"],correct:0},
+  {q:"Khi đi bộ trên đường chúng ta phải đi bên nào?",emoji:"🚶",ans:["Đi bên trái","Đi bên phải","Đi ở giữa"],correct:1},
+  {q:"Sau khi chơi đồ chơi xong con nên làm gì?",emoji:"🧸",ans:["Để đấy, không cất","Sắp xếp lộn xộn rồi cất","Sắp xếp gọn gàng, cất đúng nơi quy định"],correct:2},
+  {q:"Động vật nuôi nào đẻ con?",emoji:"🐾",ans:["Chó, gà, vịt","Bò, lợn, ngan","Chó, mèo, bò"],correct:2},
+  {q:"Ngày 20/11 là ngày gì?",emoji:"📆",ans:["Ngày quốc tế thiếu nhi","Ngày quốc tế phụ nữ","Ngày nhà giáo Việt Nam"],correct:2},
+  {q:"Quốc kỳ Việt Nam có màu gì và hình gì?",emoji:"🇻🇳",ans:["Màu vàng, hình sao","Màu đỏ, sao vàng 5 cánh","Màu cam, hình sao"],correct:1},
+  {q:"Các con sẽ làm gì để bảo vệ môi trường xanh, sạch, đẹp?",emoji:"🌱",ans:["Nhặt rác, bỏ đúng nơi quy định","Vứt rác bừa bãi","Ngắt lá, bẻ cành"],correct:0},
+  {q:"Khi lỡ tay làm bạn trong lớp bị ngã con sẽ làm gì?",emoji:"🤝",ans:["Chỉ đứng nhìn","Đỡ bạn dậy và xin lỗi bạn","Chạy đi chơi tiếp"],correct:1},
+  {q:"Khi cô giáo đang giảng bài con sẽ làm gì?",emoji:"📖",ans:["Chú ý nghe cô giảng bài","Quay sang nói chuyện với bạn","Chơi đồ chơi"],correct:0},
+  {q:"Bé sẽ nói gì khi được người khác giúp? Hoặc muốn đi đâu đó?",emoji:"🗣️",ans:["Con cảm ơn, con xin phép","Không cần nói gì cả","Cứ thế đi, không cần xin phép"],correct:0},
+  {q:"Khối vuông có tất cả mấy mặt bao quanh?",emoji:"🎲",ans:["4 mặt bao quanh","5 mặt bao quanh","6 mặt bao quanh"],correct:2},
+  {q:"Trên cây có 8 quả bưởi, hái đi 3 quả. Hỏi còn lại bao nhiêu quả?",emoji:"🍊",ans:["4 quả","5 quả","6 quả"],correct:1},
+  {q:"Bé làm gì khi ho, hắt hơi?",emoji:"🤧",ans:["Không làm gì cả","Quay đi và lấy tay che miệng","Đeo khẩu trang"],correct:1},
+  {q:"Thực phẩm nào sau đây bé KHÔNG nên ăn?",emoji:"🥗",ans:["Cơm, thức ăn mặn","Thức ăn ôi thiu, nước có ga","Quả ổi, thanh long, dưa hấu"],correct:1},
+  {q:"Khi người lạ cho kẹo, rủ đi chơi — bé sẽ làm gì?",emoji:"🍬",ans:["Đi theo người lạ","Chỉ nhận kẹo, không đi theo","Không nhận kẹo, không đi theo"],correct:2},
+  {q:"Những hành vi nào sau đây gây nguy hiểm cho bé?",emoji:"⚠️",ans:["Trèo cây, trèo ban công tường rào","Ngồi xe máy đội mũ bảo hiểm","Đi bộ trên vỉa hè bên phải"],correct:0},
+  {q:"Bảng chữ cái bé học có tất cả bao nhiêu chữ?",emoji:"🔡",ans:["50 chữ","27 chữ","29 chữ"],correct:2},
+  {q:"Đây là một chữ số có đặc điểm giống một chữ cái mà con đã học?",emoji:"🔢",ans:["Số 10","Số 0","Số 8"],correct:1},
+  {q:"Trong các hành động sau, hành động nào là thiếu văn minh nơi công cộng?",emoji:"🏙️",ans:["Chen lấn, không xếp hàng khi mua vé","Không nhường chỗ cho người già ở bến xe","Tất cả hai phương án trên"],correct:2},
+  {q:"Tách nhóm 8 thành hai phần, một phần là 2. Phần còn lại có số lượng là bao nhiêu?",emoji:"🧮",ans:["4","6","5"],correct:1},
+  {q:"Khi người khác đang nói chuyện con nên làm gì?",emoji:"👂",ans:["Con nói to hơn","Chú ý lắng nghe, đợi khi họ nói hết câu","Nói leo người lớn"],correct:1}
+];
+
+// ===== STATE =====
+let currentQ = 0;
+let timerID = null;
+let timeLeft = 10;
+let bgStarted = false;
+const CIRCUM = 213; // 2*pi*34
+
+function startQuiz(){
+  initAudioAssets();
+  getACtx();
+  if(!bgStarted){playBgMusic();bgStarted=true;}
+  playBell();
+  currentQ = 0;
+  document.getElementById('intro-screen').classList.remove('active');
+  document.getElementById('quiz-screen').classList.add('active');
+  showQ();
+}
+
+function showQ(){
+  clearInterval(timerID);
+  timerID = null;
+  stopCountdownAudio();
+  timeLeft = 10;
+
+  const q = questions[currentQ];
+  document.getElementById('q-num').textContent = currentQ+1;
+  document.getElementById('q-label').textContent = 'CÂU HỎI '+(currentQ+1);
+  document.getElementById('q-emoji').textContent = q.emoji;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('progress-fill').style.width = (currentQ/questions.length*100)+'%';
+
+  // hide action buttons
+  document.getElementById('btn-reveal').classList.remove('show');
+  document.getElementById('btn-next').classList.remove('show');
+
+  // Build answer buttons (locked — pointer-events:none via class)
+  const grid = document.getElementById('answers-grid');
+  const cnt = q.ans.length;
+  grid.className = 'answers-grid '+(cnt===3?'grid-3':'grid-2');
+  grid.innerHTML = '';
+  q.ans.forEach((a,i)=>{
+    const btn = document.createElement('div');
+    btn.className = 'ans-btn';
+    btn.id = 'ans'+i;
+    btn.innerHTML = `<div class="ans-label">${['1','2','3','4'][i]}</div><span>${a}</span><div class="correct-tick">✓</div>`;
+    grid.appendChild(btn);
+  });
+
+  // Animate
+  const card = document.querySelector('.q-card');
+  card.style.animation='none'; card.offsetHeight; card.style.animation='slide-up 0.4s ease';
+  grid.style.animation='none'; grid.offsetHeight; grid.style.animation='slide-up 0.5s ease';
+
+  updateRing(10);
+  const startBtn = document.getElementById('btn-start-timer');
+  if(startBtn){
+    startBtn.disabled = false;
+    startBtn.textContent = 'Bấm giờ';
+  }
+}
+
+function activateTimer(){
+  if(timerID!==null || timeLeft<=0) return;
+  const startBtn = document.getElementById('btn-start-timer');
+  if(startBtn){
+    startBtn.disabled = true;
+    startBtn.textContent = 'Đang đếm...';
+  }
+  startCountdownAudio();
+  if(!timeoutBuffer) playTick(false);
+  startTimer();
+}
+
+function updateRing(t){
+  const ring = document.getElementById('timer-ring');
+  const circle = document.getElementById('timer-circle');
+  ring.style.strokeDashoffset = CIRCUM*(1-t/10);
+  document.getElementById('timer-display').textContent = t;
+  if(t===0){
+    ring.className='timer-ring done'; circle.className='timer-circle done'; return;
+  }
+  if(t<=3){
+    ring.classList.add('urgent'); ring.classList.remove('done');
+    circle.classList.add('urgent'); circle.classList.remove('done');
+    if(!countdownSource) playTick(true);
+  } else {
+    ring.classList.remove('urgent','done');
+    circle.classList.remove('urgent','done');
+    if(t<10 && !countdownSource) playTick(false);
+  }
+}
+
+function startTimer(){
+  if(timerID!==null) return;
+  timerID = setInterval(()=>{
+    timeLeft--;
+    updateRing(timeLeft);
+    if(timeLeft<=0){ clearInterval(timerID); timerID = null; onTimerDone(); }
+  },1000);
+}
+
+function onTimerDone(){
+  playTimeout();
+  const btn = document.getElementById('btn-reveal');
+  // re-trigger animation each time
+  btn.style.animation='none';
+  btn.offsetHeight;
+  btn.style.animation='reveal-pop 0.5s cubic-bezier(.36,1.8,.64,1) both';
+  btn.classList.add('show');
+}
+
+function revealAnswer(){
+  const q = questions[currentQ];
+  document.getElementById('btn-reveal').classList.remove('show');
+  const correct = document.getElementById('ans'+q.correct);
+  if(correct){
+    correct.classList.add('reveal-correct');
+  }
+  playCorrect();
+  spawnConfetti(28);
+  spawnRewards();
+  document.getElementById('btn-next').classList.add('show');
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=questions.length){ showResult(); }
+  else { showQ(); }
+}
+
+function showResult(){
+  clearInterval(timerID);
+  stopBg();
+  document.getElementById('quiz-screen').classList.remove('active');
+  document.getElementById('result-screen').classList.add('active');
+  document.getElementById('progress-fill').style.width='100%';
+  playBell();
+  spawnConfetti(90);
+}
+
+function showVideoScreen(){
+  const iframe = document.getElementById('result-video');
+  if(iframe){
+    iframe.src = 'https://www.youtube.com/embed/KQiPFWTNVZU?si=wBFfozPbuOk_uOOe&loop=1&playlist=KQiPFWTNVZU&autoplay=1';
+    document.getElementById('video-screen').classList.add('active');
+  }
+}
+
+function closeVideo(){
+  const screen = document.getElementById('video-screen');
+  if(screen){
+    screen.classList.remove('active');
+  }
+  const iframe = document.getElementById('result-video');
+  if(iframe){
+    iframe.src = '';
+  }
+}
+
+function restartQuiz(){
+  document.getElementById('result-screen').classList.remove('active');
+  document.getElementById('intro-screen').classList.add('active');
+  closeVideo();
+  bgStarted = false;
+}
+
+function spawnConfetti(n=40){
+  const cols=['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#98FB98','#FF8C69'];
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      const s=8+Math.random()*12;
+      el.className='confetti-piece';
+      el.style.cssText=`left:${Math.random()*100}vw;top:-20px;width:${s}px;height:${s}px;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.5+Math.random()*2}s`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),4000);
+    },i*35);
+  }
+}
+function spawnRewards(){
+  const em=['⭐','🌟','💫','✨','🎉','🏅','🌈','💛'];
+  for(let i=0;i<7;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='floating-reward';
+      el.textContent=em[Math.floor(Math.random()*em.length)];
+      el.style.cssText=`left:${20+Math.random()*60}vw;top:${25+Math.random()*35}vh;animation-duration:${1+Math.random()*0.8}s`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),2500);
+    },i*90);
+  }
+}
+</script>
+</body>
+</html>
